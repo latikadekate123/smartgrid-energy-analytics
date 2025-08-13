@@ -7,9 +7,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import plotly.express as px
 
-# -----------------------
 # Simulate Usage Data
-# -----------------------
+
 np.random.seed(42)
 dates = pd.date_range(start=datetime.now()-timedelta(days=30), periods=720, freq='H')
 usage_power = np.random.normal(loc=2.0, scale=0.5, size=len(dates))  # kW
@@ -19,18 +18,16 @@ usage_df = pd.DataFrame({
     'global_active_power': usage_power
 })
 
-# -----------------------
 # Simulate Forecast using Prophet
-# -----------------------
+
 prophet_df = usage_df.rename(columns={'datetime':'ds', 'global_active_power':'y'})
 model = Prophet(daily_seasonality=True)
 model.fit(prophet_df)
 future = model.make_future_dataframe(periods=48, freq='H')
 forecast = model.predict(future)
 
-# -----------------------
 # Simulate Complaints
-# -----------------------
+
 appliances = ["Air Conditioner", "Refrigerator", "Heater"]
 issues = [
     "consuming too much power",
@@ -46,24 +43,21 @@ for _ in range(30):
 
 complaints_df = pd.DataFrame(complaints)
 
-# -----------------------
 # NLP Clustering
-# -----------------------
+
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(complaints_df['complaint_text'])
 kmeans = KMeans(n_clusters=3, random_state=42)
 complaints_df['cluster'] = kmeans.fit_predict(X)
 
-# -----------------------
 # Anomaly Detection (Z-score)
-# -----------------------
+
 usage_df['z_score'] = (usage_df['global_active_power'] - usage_df['global_active_power'].mean()) / usage_df['global_active_power'].std()
 anomalies = usage_df[np.abs(usage_df['z_score']) > 2.5]
 
-# -----------------------
 # Streamlit Dashboard
-# -----------------------
-st.title("Smart Grid Energy Dashboard Demo")
+
+st.title("✨Smart Grid Energy Dashboard Demo✨")
 
 # Historical usage
 st.subheader("1️⃣ Historical Usage")
