@@ -42,12 +42,12 @@ engine = create_engine(f"postgresql+psycopg2://postgres:{password}@localhost:543
 # 4. Create Schema
 
 schema_sql = """
-CREATE TABLE appliances (
+CREATE TABLE  IF NOT EXISTS appliances (
     appliance_id SERIAL PRIMARY KEY,
     appliance_name TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE usage_logs (
+CREATE TABLE  IF NOT EXISTS usage_logs (
     log_id SERIAL PRIMARY KEY,
     datetime TIMESTAMP NOT NULL,
     appliance_id INT REFERENCES appliances(appliance_id),
@@ -60,14 +60,14 @@ CREATE TABLE usage_logs (
     sub_metering_3 FLOAT
 );
 
-CREATE TABLE feedback (
+CREATE TABLE  IF NOT EXISTS feedback (
     feedback_id SERIAL PRIMARY KEY,
     complaint_date TIMESTAMP,
     appliance_id INT REFERENCES appliances(appliance_id),
     complaint_text TEXT
 );
 
-CREATE TABLE forecast_log (
+CREATE TABLE  IF NOT EXISTS forecast_log (
     forecast_id SERIAL PRIMARY KEY,
     appliance_id INT REFERENCES appliances(appliance_id),
     forecast_date TIMESTAMP,
