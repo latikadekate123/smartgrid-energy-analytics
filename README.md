@@ -1,45 +1,105 @@
-# Smart Grid Energy Analytics
+# Smartgrid Power System Load Forecasting
 
-This is a project I built to monitor and detect anomalies in household appliance energy consumption.
-It’s a complete ETL + analytics + visualization pipeline — from raw data → clean dataset → usage metrics → anomaly detection → interactive dashboard.
+This is my end-to-end load forecasting project.
+I built it to be resume-ready and easy to demo with a live Streamlit dashboard.
 
----
-## Dataset
+## What I Built
 
-The project uses smart grid household appliance consumption data : **UCI Smart Grid Household Energy Dataset**.  
+- A production-style forecasting pipeline that joins demand and weather data in PostgreSQL.
+- Data quality handling for missing values and data drift checks.
+- Model benchmarking between ARIMA baseline and a gradient-boosted model.
+- A Streamlit app that shows metrics, drift status, and forecast vs actual values.
 
-| Column Name                        | Description                                 |
-| ---------------------------------- | ------------------------------------------- |
-| `datetime`                         | Timestamp of the reading                    |
-| `appliance_id` or `appliance_name` | Which appliance the reading is for          |
-| `global_active_power`              | Active power consumption in kW              |
-| `global_reactive_power`            | Reactive power in kW                        |
-| `voltage`                          | Voltage at that timestamp                   |
-| `global_intensity`                 | Current intensity in A                      |
-| `sub_metering_1/2/3`               | Power usage of specific zones or appliances |
+## Resume Highlights
 
----
+- Built a production-ready forecasting pipeline joining weather and demand signals in PostgreSQL, using Python scripts to handle data drift and missing values.
+- Deployed a gradient-boosted model in a Dockerized setup and benchmarked it against ARIMA using MAE.
 
-## Features
-- **ETL Pipeline**:  
-  - Read raw smart grid appliance consumption data.  
-  - Clean and standardize timestamps, missing values, and column names.  
-  - Saves the cleaned dataset locally or to a database for further analysis.
-  
-- **Usage Metrics**:  
-  - Calculates average hourly and daily kWh for each appliance.
-  - Summarizes total household consumption for quick insights.
+## How The Pipeline Works
 
-- **Anomaly Detection**:  
-  - Z-score method to flag unusual consumption patterns.
+1. Load demand data from the UCI dataset (or synthetic fallback if raw file path is not provided).
+2. Generate hourly weather signals.
+3. Inject and impute missing values.
+4. Join weather and demand into a PostgreSQL feature store.
+5. Run drift checks between reference and recent windows.
+6. Train and compare:
+   - ARIMA(1,0,0)
+   - HistGradientBoostingRegressor
+7. Save metrics and predictions in PostgreSQL.
 
-- **Interactive Dashboard (Streamlit)**:  
-  - Shows appliance-wise consumption trends over time.
-  - Displays the distribution of anomalies.
-  - Lets you filter by date range, appliance type, and choose time aggregation
+## Main Files
 
- ## Example Insights You Can Get
-  
-  - Which appliance consumes the most energy over a given period.
-  - Hours/days when consumption spikes unexpectedly.
-  - Trends in household usage over time.
+- `src/pipeline/run_pipeline.py`: runs the full pipeline.
+- `src/pipeline/modeling.py`: ARIMA vs gradient-boosted benchmark.
+- `src/pipeline/data_processing.py`: cleaning, missing data, drift prep.
+- `src/pipeline/db.py`: schema setup and SQL operations.
+- `sql/schema.sql`: PostgreSQL tables.
+- `streamlit_modified.py`: dashboard app.
+
+## Run Locally
+
+1. Install requirements:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Set environment variables:
+
+```bash
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=postgres
+PGUSER=postgres
+PGPASSWORD=your_password
+```
+
+3. Run pipeline:
+
+```bash
+python -m src.pipeline.run_pipeline
+```
+
+4. Run dashboard:
+
+```bash
+streamlit run streamlit_modified.py
+```
+
+## Run With Docker
+
+```bash
+docker compose up --build pipeline
+docker compose up --build streamlit
+```
+
+## Deploy And Get Shareable Link (For Resume)
+
+GitHub link only shows code. To get a clickable live demo, deploy the app.
+
+### Streamlit Community Cloud (recommended)
+
+1. Push this repo to GitHub.
+2. Create a managed PostgreSQL database (Neon / Supabase / Render).
+3. Go to Streamlit Cloud and create a new app.
+4. Select this repo and set main file path to `streamlit_modified.py`.
+5. Add these secrets in Streamlit Cloud:
+
+```toml
+PGHOST="<db-host>"
+PGPORT="5432"
+PGDATABASE="<db-name>"
+PGUSER="<db-user>"
+PGPASSWORD="<db-password>"
+```
+
+6. Deploy and use the generated URL on your resume:
+
+```text
+https://<your-app-name>.streamlit.app
+```
+
+## Suggested Resume Links
+
+- GitHub: `https://github.com/latikadekate123/Smartgrid-Power-System-Load-Forecasting`
+- Live App: `https://<your-app-name>.streamlit.app`

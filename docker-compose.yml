@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: smartgrid-postgres
+    environment:
+      POSTGRES_DB: smartgrid
+      POSTGRES_USER: smartgrid
+      POSTGRES_PASSWORD: smartgrid
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  pipeline:
+    build: .
+    container_name: smartgrid-pipeline
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: smartgrid
+      PGUSER: smartgrid
+      PGPASSWORD: smartgrid
+      MODEL_OUTPUT_PATH: models/gradient_boosted.joblib
+      RAW_DATA_PATH: ""
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app
+
+  streamlit:
+    build: .
+    container_name: smartgrid-streamlit
+    command: streamlit run streamlit_modified.py --server.address 0.0.0.0 --server.port 8501
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: smartgrid
+      PGUSER: smartgrid
+      PGPASSWORD: smartgrid
+    depends_on:
+      - postgres
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app
+
+volumes:
+  pg_data:
