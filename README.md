@@ -93,13 +93,4 @@ PGUSER="<db-user>"
 PGPASSWORD="<db-password>"
 ```
 
-6. Deploy and use the generated URL on your resume:
 
-```text
-https://<your-app-name>.streamlit.app
-```
-
-## Suggested Resume Links
-
-- GitHub: `https://github.com/latikadekate123/Smartgrid-Power-System-Load-Forecasting`
-- Live App: `https://<your-app-name>.streamlit.app`
